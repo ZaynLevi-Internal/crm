@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Invoice {{ invoice.number }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Invoice {{ invoice.number }}</h2>
+        <div class="text-muted">Created {{ invoice.created_at.strftime('%Y-%m-%d') }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('invoices') }}" class="btn btn-secondary">Back</a>
+        <button class="btn btn-outline-primary" onclick="window.print()">
+            <i class="bi bi-printer"></i> Print
+        </button>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted">Bill To</h6>
+                <div><strong>{{ invoice.client_name }}</strong></div>
+                {% if invoice.client_company %}
+                <div>{{ invoice.client_company }}</div>
+                {% endif %}
+                {% if invoice.client_email %}
+                <div>{{ invoice.client_email }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <div><strong>Issue Date:</strong> {{ invoice.issue_date.strftime('%Y-%m-%d') }}</div>
+                <div><strong>Due Date:</strong> {{ invoice.due_date.strftime('%Y-%m-%d') if invoice.due_date else 'N/A' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.description }}</td>
+                        <td class="text-end">{{ '%.2f'|format(item.quantity) }}</td>
+                        <td class="text-end">₹{{ '%.2f'|format(item.unit_price) }}</td>
+                        <td class="text-end">₹{{ '%.2f'|format(item.line_total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        {% if invoice.notes %}
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted">Notes</h6>
+                <p class="mb-0">{{ invoice.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <span>Subtotal</span>
+                    <span>₹{{ '%.2f'|format(invoice.subtotal) }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Tax ({{ '%.2f'|format(invoice.tax_rate) }}%)</span>
+                    <span>₹{{ '%.2f'|format(invoice.tax_amount) }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Total</span>
+                    <span>₹{{ '%.2f'|format(invoice.total) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

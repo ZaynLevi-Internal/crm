@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Invoices</h2>
+    <a href="{{ url_for('new_invoice') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Generate Invoice
+    </a>
+</div>
+<div class="card">
+    {% set col_count = 6 if current_user.is_admin else 5 %}
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Client</th>
+                    <th>Total</th>
+                    <th>Created</th>
+                    {% if current_user.is_admin %}
+                    <th>Created By</th>
+                    {% endif %}
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.number }}</td>
+                    <td>{{ invoice.client_name }}</td>
+                    <td>₹{{ '%.2f'|format(invoice.total) }}</td>
+                    <td>{{ invoice.created_at.strftime('%Y-%m-%d') }}</td>
+                    {% if current_user.is_admin %}
+                    <td>{{ invoice.user.username }}</td>
+                    {% endif %}
+                    <td>
+                        <a href="{{ url_for('view_invoice', id=invoice.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-receipt"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ col_count }}" class="text-center text-muted">No invoices yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
